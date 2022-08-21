@@ -80,6 +80,7 @@ import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.ActivitySample;
 import nodomain.freeyourgadget.gadgetbridge.model.DailyTotals;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
+import nodomain.freeyourgadget.gadgetbridge.service.mqtt.MqttConnection;
 import nodomain.freeyourgadget.gadgetbridge.util.AndroidUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.DeviceHelper;
 import nodomain.freeyourgadget.gadgetbridge.util.GB;
@@ -359,6 +360,10 @@ public class ControlCenterv2 extends AppCompatActivity
                 Intent dbIntent = new Intent(this, DataManagementActivity.class);
                 startActivity(dbIntent);
                 return false;
+            case R.id.action_mqtt:
+                MqttConnection mqttConnection = new MqttConnection(this, "xx");
+                mqttConnection.connect(this, "xxx");
+                return false;
             case R.id.action_notification_management:
                 Intent blIntent = new Intent(this, NotificationManagementActivity.class);
                 startActivity(blIntent);
@@ -569,8 +574,8 @@ public class ControlCenterv2 extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             Context context = getContext();
             builder.setMessage(context.getString(R.string.permission_notification_policy_access,
-                    getContext().getString(R.string.app_name),
-                    getContext().getString(R.string.ok)))
+                            getContext().getString(R.string.app_name),
+                            getContext().getString(R.string.ok)))
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             startActivity(new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS));
@@ -588,8 +593,8 @@ public class ControlCenterv2 extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             Context context = getContext();
             builder.setMessage(context.getString(R.string.permission_notification_listener,
-                                    getContext().getString(R.string.app_name),
-                                    getContext().getString(R.string.ok)))
+                            getContext().getString(R.string.app_name),
+                            getContext().getString(R.string.ok)))
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent enableIntent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
