@@ -80,7 +80,7 @@ import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.ActivitySample;
 import nodomain.freeyourgadget.gadgetbridge.model.DailyTotals;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
-import nodomain.freeyourgadget.gadgetbridge.service.mqtt.MqttConnection;
+import nodomain.freeyourgadget.gadgetbridge.service.rest.HSenseService;
 import nodomain.freeyourgadget.gadgetbridge.util.AndroidUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.DeviceHelper;
 import nodomain.freeyourgadget.gadgetbridge.util.GB;
@@ -361,8 +361,7 @@ public class ControlCenterv2 extends AppCompatActivity
                 startActivity(dbIntent);
                 return false;
             case R.id.action_mqtt:
-                MqttConnection mqttConnection = new MqttConnection(this, "xx");
-                mqttConnection.connect(this, "xxx");
+                HSenseService HSenseService = new HSenseService();
                 return false;
             case R.id.action_notification_management:
                 Intent blIntent = new Intent(this, NotificationManagementActivity.class);

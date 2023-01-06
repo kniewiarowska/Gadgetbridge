@@ -190,6 +190,9 @@ android {
             jniLibs.srcDirs = ['libs'] // where libs is the name of the directory!
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 pmd {
@@ -200,6 +203,9 @@ dependencies {
 //    testImplementation "ch.qos.logback:logback-classic:1.1.3"
 //    testImplementation "ch.qos.logback:logback-core:1.1.3"
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
+    implementation 'androidx.navigation:navigation-ui:2.5.3'
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:1.10.19"
     testImplementation "org.robolectric:robolectric:4.2.1"
