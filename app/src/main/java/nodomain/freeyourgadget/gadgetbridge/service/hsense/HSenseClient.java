@@ -146,14 +146,16 @@ public class HSenseClient {
 
                         if (responseCode == connection.HTTP_OK) {
                             BufferedReader in = getResponseFromEndpoint(connection);
-                            hSenseAuthManager.setUpAuthData(username, password, in.toString());
+                            JSONObject reply = new JSONObject(in.toString());
+                            String jwt = reply.get("jwt").toString();
+                            hSenseAuthManager.setUpAuthData(username, password, jwt);
 
                         } else {
                             Log.i(TAG, "POST request did not work.");
                         }
                         responseCodeValue[0] = responseCode;
 
-                    } catch (IOException e) {
+                    } catch (IOException | JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -173,6 +175,10 @@ public class HSenseClient {
     private String getActiveJwtToken() {
         if (!checkIfTokenIsActive()) {
             updateJwtManager();
+            Log.i("HSenseClient","Token not active");
+        } else {
+            Log.i("HSenseClient","Token is active");
+
         }
         return hSenseAuthManager.getJwtToken();
     }

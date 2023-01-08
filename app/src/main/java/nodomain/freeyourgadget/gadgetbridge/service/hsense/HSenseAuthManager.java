@@ -43,10 +43,11 @@ public class HSenseAuthManager {
 
     public boolean checkIfJwtIsActive(){
         String jwtTokenDate = sharedPreferences.getString(JWT_TOKEN_DATE, null);
-        LocalDateTime jwtDate = LocalDateTime.parse(jwtTokenDate);
-        if(jwtDate == null){
+        if(jwtTokenDate == null){
             return false;
         }
+        LocalDateTime jwtDate = LocalDateTime.parse(jwtTokenDate);
+
 
         if (jwtDate.plusDays(1).isBefore(LocalDateTime.now())) {
             return true;
