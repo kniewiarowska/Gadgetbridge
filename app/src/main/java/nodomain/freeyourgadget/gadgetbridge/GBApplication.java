@@ -22,7 +22,10 @@ import android.annotation.TargetApi;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.NotificationManager.Policy;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,6 +37,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
@@ -75,6 +79,7 @@ import nodomain.freeyourgadget.gadgetbridge.model.ActivityUser;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceType;
 import nodomain.freeyourgadget.gadgetbridge.service.NotificationCollectorMonitorService;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseJobService;
 import nodomain.freeyourgadget.gadgetbridge.util.AndroidUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.FileUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.GB;
@@ -152,9 +157,11 @@ public class GBApplication extends Application {
     private BluetoothStateChangeReceiver bluetoothStateChangeReceiver;
 
     private OpenTracksContentObserver openTracksObserver;
-    
+
     private long lastAutoExportTimestamp = 0;
     private long autoExportScheduledTimestamp = 0;
+
+    private JobScheduler jobScheduler;
 
     public static void quit() {
         GB.log("Quitting Gadgetbridge...", GB.INFO, null);
@@ -252,6 +259,22 @@ public class GBApplication extends Application {
                                 .build(), context);
             }
         }
+
+
+        ComponentName component = new ComponentName(this, HSenseJobService.class);
+        JobInfo info = new JobInfo.Builder(1, component)
+                .setRequiresCharging(false)
+                .setPeriodic(5* 60 * 1000)
+                .build(); //every 60 minutes
+
+         jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        int resultCode = jobScheduler.schedule(info);
+        if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            Log.i("HSENSE", "JobScheduled");
+        } else {
+            Log.i("HSENSE", "JobScheduling failed");
+        }
+
     }
 
     @Override
@@ -607,7 +630,7 @@ public class GBApplication extends Application {
                     DeviceType deviceType = fromKey(dbDevice.getType());
 
                     if (deviceTypes.contains(deviceType)) {
-                        Log.i(TAG, "migrating global string preference " + globalPref + " for " + deviceType.name() + " " + dbDevice.getIdentifier() );
+                        Log.i(TAG, "migrating global string preference " + globalPref + " for " + deviceType.name() + " " + dbDevice.getIdentifier());
                         deviceSharedPrefsEdit.putString(perDevicePref, globalPrefValue);
                     }
                     deviceSharedPrefsEdit.apply();
@@ -633,7 +656,7 @@ public class GBApplication extends Application {
                     DeviceType deviceType = fromKey(dbDevice.getType());
 
                     if (deviceTypes.contains(deviceType)) {
-                        Log.i(TAG, "migrating global boolean preference " + globalPref + " for " + deviceType.name() + " " + dbDevice.getIdentifier() );
+                        Log.i(TAG, "migrating global boolean preference " + globalPref + " for " + deviceType.name() + " " + dbDevice.getIdentifier());
                         deviceSharedPrefsEdit.putBoolean(perDevicePref, globalPrefValue);
                     }
                     deviceSharedPrefsEdit.apply();
@@ -805,8 +828,8 @@ public class GBApplication extends Application {
                     DeviceType deviceType = fromKey(dbDevice.getType());
 
                     if (deviceType == MIBAND) {
-                        int deviceTimeOffsetHours = deviceSharedPrefs.getInt("device_time_offset_hours",0);
-                        deviceSharedPrefsEdit.putString("device_time_offset_hours", Integer.toString(deviceTimeOffsetHours) );
+                        int deviceTimeOffsetHours = deviceSharedPrefs.getInt("device_time_offset_hours", 0);
+                        deviceSharedPrefsEdit.putString("device_time_offset_hours", Integer.toString(deviceTimeOffsetHours));
                     }
 
                     deviceSharedPrefsEdit.apply();
@@ -908,7 +931,7 @@ public class GBApplication extends Application {
             try (DBHandler db = acquireDB()) {
                 DaoSession daoSession = db.getDaoSession();
                 List<Device> activeDevices = DBHelper.getActiveDevices(daoSession);
-                migrateBooleanPrefToPerDevicePref("transliteration", false, "pref_transliteration_enabled", (ArrayList)activeDevices);
+                migrateBooleanPrefToPerDevicePref("transliteration", false, "pref_transliteration_enabled", (ArrayList) activeDevices);
                 Log.w(TAG, "migrating transliteration settings");
             } catch (Exception e) {
                 Log.w(TAG, "error acquiring DB lock and migrating prefs");

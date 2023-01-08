@@ -1380,7 +1380,7 @@
     <string name="medley">Medley</string>
     <string name="devicetype_nut_mini">Nut mini</string>
     <string name="qhybrid_calibration_align_hint">Use the buttons below to align the watch hands to 12:00.</string>
-    <string translatable="false" name="lorem_ipsum">Lorem Ipsum</string>
+    <string name="lorem_ipsum" translatable="false">Lorem Ipsum</string>
     <plurals name="widget_alarm_target_hours">
         <item quantity="one">%d hour</item>
         <item quantity="two">%d hours</item>
@@ -1719,4 +1719,9 @@
     <string name="connection_over_bt_classic">Connection over Bluetooth classic</string>
     <string name="autoconnect_from_device_title">Connect on connection from device</string>
     <string name="autoconnect_from_device_summary">Establish a connection when connection is initiated by device, like headphones</string>
+    <string name="register">Register</string>
+    <string name="login">LOGIN</string>
+    <string name="login_text_above_form">Login:</string>
+    <string name="password_hint">Password</string>
+    <string name="login_hint">Login</string>
 </resources>

@@ -71,7 +71,7 @@ public class HSenseDataExporter {
 
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + MiBandActivitySampleDao.TABLENAME, null);
-        //db.query(
+//        db.query(
 //                MiBandActivitySampleDao.Properties.Steps.columnName,   // The table to query
 //                projection,             // The array of columns to return (pass null to get all)
 //                selection,              // The columns for the WHERE clause

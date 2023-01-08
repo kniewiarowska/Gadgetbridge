@@ -1,5 +1,6 @@
 package nodomain.freeyourgadget.gadgetbridge.service.hsense;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -20,35 +21,82 @@ import nodomain.freeyourgadget.gadgetbridge.database.HSenseDataExporter;
 
 public class HSenseClient {
 
+    public Context context;
     public final String hSenseUrl = "https://hsense.lovemyiot.org";
     public HSenseDataExporter hSenseDataExporter;
+    public HSenseAuthManager hSenseAuthManager;
+    private String TAG = "HSenseClient";
+
+    public HSenseClient(Context context) {
+        this.context = context;
+        this.hSenseDataExporter = new HSenseDataExporter(context);
+        this.hSenseAuthManager = new HSenseAuthManager(context);
+    }
+
+    private HttpsURLConnection prepareConnection(URL url) throws IOException {
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+        return connection;
+    }
+
+    private HttpsURLConnection prepareConnectionAndExecutePOSTRequest(URL url, JSONObject jsonObject) throws IOException {
+
+        HttpsURLConnection connection = prepareConnection(url);
+        OutputStream os = connection.getOutputStream();
+        os.write(jsonObject.toString().getBytes());
+        os.flush();
+        os.close();
+        return connection;
+    }
+
+    private HttpsURLConnection postDataToServer(URL url, List<JSONObject> jsonObject, String jwt) throws IOException {
+        HttpsURLConnection connection = prepareConnection(url);
+        connection.setRequestProperty("Authorization", "Bearer " + jwt);
+
+        OutputStream os = connection.getOutputStream();
+        os.write(jsonObject.toString().getBytes());
+        os.flush();
+        os.close();
+        return connection;
+    }
+
+
+    private BufferedReader getResponseFromEndpoint(HttpsURLConnection connection) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return in;
+    }
 
     public void register(String username, String password, String reaptedPassword, String emial) {
 
         try {
-            URL hSenseEndpoint = new URL(hSenseUrl+ "/register");
+            URL registerEndpoint = new URL(hSenseUrl + "/register");
             JSONObject registerObject = new JSONObject()
                     .put("username", username)
                     .put("password", password)
-                    .put("repeated-password", reaptedPassword  )
+                    .put("repeated-password", reaptedPassword)
                     .put("email", emial);
 
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        HttpsURLConnection connection =
-                                (HttpsURLConnection) hSenseEndpoint.openConnection();
-                        connection.setRequestMethod("POST");
-                        connection.setDoOutput(true);
-                        OutputStream os = connection.getOutputStream();
-                        os.write(registerObject.toString().getBytes());
-                        os.flush();
-                        os.close();
+                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(registerEndpoint, registerObject);
 
                         int responseCode = connection.getResponseCode();
-                        System.out.println("POST Response Code :: " + responseCode);
-                        if (responseCode ==  connection.HTTP_OK) { //success
+                        Log.i("HSenseClient", "POST Response Code :: " + responseCode);
+
+                        if (responseCode == connection.HTTP_OK) {
                             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                             String inputLine;
                             StringBuffer response = new StringBuffer();
@@ -56,23 +104,19 @@ public class HSenseClient {
                             while ((inputLine = in.readLine()) != null) {
                                 response.append(inputLine);
                             }
+
                             in.close();
-
-                            // print result
-                            System.out.println(response.toString());
-
                         } else {
-                            System.out.println("POST request did not work.");
-
+                            Log.i(TAG, "POST request did not work.");
+                            //TODO throw exception when request did not work
+                            //TODO print response from server
                         }
 
-                        //TODO return toast result + print response from server
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             });
-
 
         } catch (JSONException | MalformedURLException e) {
             e.printStackTrace();
@@ -80,57 +124,106 @@ public class HSenseClient {
 
     }
 
-    public void login(String username, String password ) {
+    public Integer login(String username, String password) {
+
+        final Integer[] responseCodeValue = new Integer[1];
 
         try {
-            URL hSenseEndpoint = new URL(hSenseUrl+ "/login");
-            List<JSONObject> dataObject = hSenseDataExporter.getDataToPublish();
+            URL loginEndpoint = new URL(hSenseUrl + "/login");
+            JSONObject dataObject = new JSONObject()
+                    .put("username", username)
+                    .put("password", password);
 
             AsyncTask.execute(new Runnable() {
+
                 @Override
                 public void run() {
                     try {
-                        HttpsURLConnection connection =
-                                (HttpsURLConnection) hSenseEndpoint.openConnection();
-                        connection.setRequestMethod("POST");
-                        connection.setDoOutput(true);
-                        OutputStream os = connection.getOutputStream();
-                        os.write(dataObject.toString().getBytes());
-                        os.flush();
-                        os.close();
+                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(loginEndpoint, dataObject);
 
                         int responseCode = connection.getResponseCode();
-                        System.out.println("POST Response Code :: " + responseCode);
-                        if (responseCode ==  connection.HTTP_OK) { //success
-                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                            String inputLine;
-                            StringBuffer response = new StringBuffer();
+                        Log.i(TAG, "POST Response Code :: " + responseCode);
 
-                            while ((inputLine = in.readLine()) != null) {
-                                response.append(inputLine);
-                            }
-                            in.close();
-                            //TODO save jwt
-                            // print result
-                            System.out.println(response.toString());
+                        if (responseCode == connection.HTTP_OK) {
+                            BufferedReader in = getResponseFromEndpoint(connection);
+                            hSenseAuthManager.setUpAuthData(username, password, in.toString());
 
                         } else {
-                            System.out.println("POST request did not work.");
-
+                            Log.i(TAG, "POST request did not work.");
                         }
+                        responseCodeValue[0] = responseCode;
 
-                        //TODO return toast result + print response from server
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             });
 
+        } catch (MalformedURLException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return responseCodeValue[0];
+    }
+
+    private boolean checkIfTokenIsActive() {
+        return hSenseAuthManager.checkIfJwtIsActive();
+    }
+
+    private String getActiveJwtToken() {
+        if (!checkIfTokenIsActive()) {
+            updateJwtManager();
+        }
+        return hSenseAuthManager.getJwtToken();
+    }
+
+    private void updateJwtManager() {
+        String username = hSenseAuthManager.getUsername();
+        String password = hSenseAuthManager.getPassword();
+
+        Integer resonCode = login(username, password);
+        if (resonCode != null && resonCode == 200) {
+            Log.i("HSenseClient", "Update sucessfull");
+        } else {
+            //TODO throw exception
+        }
+    }
+
+    public Integer save() {
+        final Integer[] responseCodeValue = new Integer[1];
+
+        try {
+            URL loginEndpoint = new URL(hSenseUrl + "/save");
+            getActiveJwtToken();
+            List<JSONObject> dataObject = hSenseDataExporter.getDataToPublish();
+            AsyncTask.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        HttpsURLConnection connection = postDataToServer(loginEndpoint, dataObject, hSenseAuthManager.getJwtToken());
+                        int responseCode = connection.getResponseCode();
+                        Log.i(TAG, "POST Response Code :: " + responseCode);
+
+                        if (responseCode == connection.HTTP_OK) {
+                            BufferedReader in = getResponseFromEndpoint(connection);
+                        } else {
+                            Log.i(TAG, "POST request did not work.");
+                        }
+
+                        responseCodeValue[0] = responseCode;
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+        return responseCodeValue[0];
     }
 
 }

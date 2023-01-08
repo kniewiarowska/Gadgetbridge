@@ -360,8 +360,9 @@ public class ControlCenterv2 extends AppCompatActivity
                 Intent dbIntent = new Intent(this, DataManagementActivity.class);
                 startActivity(dbIntent);
                 return false;
-            case R.id.action_mqtt:
-                HSenseService hSenseSerice = new HSenseService();
+            case R.id.action_hsense:
+                Intent hSenseIntent = new Intent(this, HSenseActivity.class);
+                startActivity(hSenseIntent);
                 return false;
             case R.id.action_notification_management:
                 Intent blIntent = new Intent(this, NotificationManagementActivity.class);
