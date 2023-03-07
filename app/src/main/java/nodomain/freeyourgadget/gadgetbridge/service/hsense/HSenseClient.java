@@ -145,8 +145,16 @@ public class HSenseClient {
                         Log.i(TAG, "POST Response Code :: " + responseCode);
 
                         if (responseCode == connection.HTTP_OK) {
-                            BufferedReader in = getResponseFromEndpoint(connection);
-                            JSONObject reply = new JSONObject(in.toString());
+                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            String inputLine;
+                            StringBuffer response = new StringBuffer();
+
+                            while ((inputLine = in.readLine()) != null) {
+                                response.append(inputLine);
+                            }
+
+                            in.close();
+                            JSONObject reply = new JSONObject(response.toString());
                             String jwt = reply.get("jwt").toString();
                             hSenseAuthManager.setUpAuthData(username, password, jwt);
 
@@ -199,7 +207,7 @@ public class HSenseClient {
         final Integer[] responseCodeValue = new Integer[1];
 
         try {
-            URL loginEndpoint = new URL(hSenseUrl + "/save");
+            URL loginEndpoint = new URL(hSenseUrl + "/hsense/save");
             getActiveJwtToken();
             List<JSONObject> dataObject = hSenseDataExporter.getDataToPublish();
             AsyncTask.execute(new Runnable() {

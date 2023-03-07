@@ -2,6 +2,7 @@ package nodomain.freeyourgadget.gadgetbridge.service.hsense;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.time.LocalDateTime;
 
@@ -44,12 +45,12 @@ public class HSenseAuthManager {
     public boolean checkIfJwtIsActive(){
         String jwtTokenDate = sharedPreferences.getString(JWT_TOKEN_DATE, null);
         if(jwtTokenDate == null){
+            Log.i("HSenseAuth", "JWT date is empty");
             return false;
         }
         LocalDateTime jwtDate = LocalDateTime.parse(jwtTokenDate);
 
-
-        if (jwtDate.plusDays(1).isBefore(LocalDateTime.now())) {
+        if (LocalDateTime.now().isBefore(jwtDate.plusDays(1))) {
             return true;
         } else {
             return false;
@@ -61,6 +62,17 @@ public class HSenseAuthManager {
 
         myEdit.putString(JWT, jwt);
         myEdit.putString(JWT_TOKEN_DATE, LocalDateTime.now().toString());
+        myEdit.apply();
+        myEdit.commit();
+    }
+
+    public void logOut() {
+        SharedPreferences.Editor myEdit = sharedPreferences.edit();
+        // write all the data entered by the user in SharedPreference and apply
+        myEdit.putString(USERNAME, null);
+        myEdit.putString(PASSWORD, null);
+        myEdit.putString(JWT , null);
+        myEdit.putString(JWT_TOKEN_DATE, null);
         myEdit.apply();
         myEdit.commit();
     }
