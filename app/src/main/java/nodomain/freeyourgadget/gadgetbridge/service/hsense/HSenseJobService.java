@@ -30,6 +30,8 @@ public class HSenseJobService extends JobService {
             public void run() {
                 HSenseClient hSenseClient = new HSenseClient(getApplicationContext());
                 Integer responseCode = hSenseClient.save();
+
+
                 Log.i(TAG, "HSense Job Performed");
                 if (responseCode != null && responseCode == 200) {
                     Log.i(TAG, "Job sucessfull");

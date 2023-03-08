@@ -13,6 +13,8 @@ import androidx.preference.PreferenceManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +28,23 @@ public class HSenseDataExporter {
 
     public HSenseDataExporter(Context context) {
         dbOpenHelper = new DBOpenHelper(context, DATABASE_NAME, null);
-        sharedPreferences = sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public List<JSONObject> getDataToPublish() {
+
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String lastTimestamp = sharedPreferences.getString("lastTimestamp", "0");
-        Cursor cursor = getData(lastTimestamp);
+        String currentTimestamp = String.valueOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        Cursor cursor = getData(lastTimestamp, currentTimestamp);
         Log.d("DATABASE: content", String.valueOf(cursor.getCount()));
+
         List<JSONObject> data = new ArrayList<>();
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
 
                 try {
+
                     JSONObject jsonObject = new JSONObject()
                             .put("timestamp", cursor.getString(0))
                             .put("device_id", cursor.getString(1))
@@ -48,38 +54,42 @@ public class HSenseDataExporter {
                             .put("heart_rate", cursor.getString(5));
 
                     Log.d("CURSOR content:", jsonObject.toString());
-
                     data.add(jsonObject);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
+           updateSharedPreferances(currentTimestamp);
         }
         return data;
     }
 
+    private void updateSharedPreferances(String currentTimestamp){
+        sharedPreferences
+                .edit()
+                .putString("lastTimestamp", currentTimestamp)
+                .commit();
+    }
 
-    private Cursor getData(String timestamp) {
+    private Cursor getData(String timestamp, String currentTimestamp) {
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
         String[] projection = {
                 BaseColumns._ID,
                 MiBandActivitySampleDao.TABLENAME
         };
 
-        String selection = MiBandActivitySampleDao.Properties.Timestamp.columnName + " < ?";
-        String[] selectionArgs = {timestamp};
+        String selection =
+                "SELECT * FROM "
+                        + MiBandActivitySampleDao.TABLENAME
+                        + " WHERE "
+                        + MiBandActivitySampleDao.Properties.Timestamp.columnName
+                        + " > ? AND "
+                        + MiBandActivitySampleDao.Properties.Timestamp.columnName
+                        + " <= ? ";
 
-
-        Cursor cursor = db.rawQuery("SELECT * FROM " + MiBandActivitySampleDao.TABLENAME, null);
-//        db.query(
-//                MiBandActivitySampleDao.Properties.Steps.columnName,   // The table to query
-//                projection,             // The array of columns to return (pass null to get all)
-//                selection,              // The columns for the WHERE clause
-//                selectionArgs,          // The values for the WHERE clause
-//                null,                   // don't group the rows
-//                null,                   // don't filter by row groups
-//                null    // The sort order
-//        );
+        String[] selectionArgs = {"1678227060", "1678227120"};
+        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
         return cursor;
     }

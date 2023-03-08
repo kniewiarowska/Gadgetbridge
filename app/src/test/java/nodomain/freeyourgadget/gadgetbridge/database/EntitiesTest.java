@@ -1,7 +1,9 @@
 package nodomain.freeyourgadget.gadgetbridge.database;
 
+import org.bouncycastle.asn1.smime.SMIMEAttributes;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -10,6 +12,8 @@ import nodomain.freeyourgadget.gadgetbridge.entities.ActivityDescription;
 import nodomain.freeyourgadget.gadgetbridge.entities.ActivityDescriptionDao;
 import nodomain.freeyourgadget.gadgetbridge.entities.Device;
 import nodomain.freeyourgadget.gadgetbridge.entities.DeviceAttributes;
+import nodomain.freeyourgadget.gadgetbridge.entities.MiBandActivitySample;
+import nodomain.freeyourgadget.gadgetbridge.entities.MiBandActivitySampleDao;
 import nodomain.freeyourgadget.gadgetbridge.entities.Tag;
 import nodomain.freeyourgadget.gadgetbridge.entities.User;
 import nodomain.freeyourgadget.gadgetbridge.entities.UserAttributes;
@@ -24,6 +28,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import android.database.Cursor;
 
 public class EntitiesTest extends TestBase {
 
@@ -40,6 +46,33 @@ public class EntitiesTest extends TestBase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    @Test
+    public void testCursorQuery() {
+        List<MiBandActivitySample> miBandActivitySamples = new ArrayList<>();
+        miBandActivitySamples.add(new MiBandActivitySample(1678226820, 1, 1, 31, 0, 0, 89));
+        miBandActivitySamples.add(new MiBandActivitySample(1678227000,1,1,1,0,0,80));
+        miBandActivitySamples.add(new MiBandActivitySample(1678227060,1,1,72,0,0, 80));
+        miBandActivitySamples.add(new MiBandActivitySample(1678227120,1,1,0,67,121,92));
+        miBandActivitySamples.add(new MiBandActivitySample(1678227180,1,1,39,0,0,16));
+
+        miBandActivitySamples.forEach(miBandActivitySample -> daoSession.getMiBandActivitySampleDao().insert(miBandActivitySample));
+
+        String selection =
+                "SELECT * FROM "
+                        + MiBandActivitySampleDao.TABLENAME
+                        + " WHERE "
+                        + MiBandActivitySampleDao.Properties.Timestamp.columnName
+                + " > ? AND "
+                + MiBandActivitySampleDao.Properties.Timestamp.columnName
+                + " <= ? ";
+
+        String[] selectionArgs = {"1678227060", "1678227120"};
+        Cursor cursor = dbHandler.getDatabase()
+                .rawQuery(selection, selectionArgs);
+
+        assertEquals(cursor.getCount(), 2);
     }
 
 

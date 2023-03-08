@@ -101,7 +101,6 @@ public class HSenseActivity extends AppCompatActivity {
                 passwordEdit.setEnabled(false);
 
                 //TODO fix
-
             }
         } else {
             loginStatus.setText("No one is logged. Please log to HSense service!");
