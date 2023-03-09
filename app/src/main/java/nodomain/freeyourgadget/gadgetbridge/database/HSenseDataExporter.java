@@ -74,10 +74,6 @@ public class HSenseDataExporter {
 
     private Cursor getData(String timestamp, String currentTimestamp) {
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
-        String[] projection = {
-                BaseColumns._ID,
-                MiBandActivitySampleDao.TABLENAME
-        };
 
         String selection =
                 "SELECT * FROM "
@@ -88,7 +84,7 @@ public class HSenseDataExporter {
                         + MiBandActivitySampleDao.Properties.Timestamp.columnName
                         + " <= ? ";
 
-        String[] selectionArgs = {"1678227060", "1678227120"};
+        String[] selectionArgs = {timestamp, currentTimestamp};
         Cursor cursor = db.rawQuery(selection, selectionArgs);
 
         return cursor;
