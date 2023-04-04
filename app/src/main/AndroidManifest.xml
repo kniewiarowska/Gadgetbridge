@@ -64,6 +64,13 @@
         android:theme="@style/GadgetbridgeTheme"
         tools:replace="android:label">
         <activity
+            android:name=".activities.HSenseLogged"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".activities.RegisterActivity"
             android:exported="false">
             <meta-data
@@ -72,7 +79,8 @@
         </activity>
         <activity
             android:name=".activities.HSenseActivity"
-            android:exported="true"></activity>
+            android:exported="true"
+            />
         <activity
             android:name=".activities.ControlCenterv2"
             android:exported="true"

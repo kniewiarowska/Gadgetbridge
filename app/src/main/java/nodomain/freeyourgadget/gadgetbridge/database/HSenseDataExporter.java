@@ -35,11 +35,13 @@ public class HSenseDataExporter {
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String lastTimestamp = sharedPreferences.getString("lastTimestamp", "0");
-         Cursor cursor = getData(lastTimestamp);
+        String currentTimestamp = String.valueOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+       currentTimestamp = currentTimestamp.substring(0, currentTimestamp.length()-3);
+        Cursor cursor = getData(lastTimestamp, currentTimestamp);
         Log.d("DATABASE: content", String.valueOf(cursor.getCount()));
 
         List<JSONObject> data = new ArrayList<>();
-        if (cursor.getCount() > 0) {
+        if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
 
                 try {
@@ -54,15 +56,12 @@ public class HSenseDataExporter {
 
                     Log.d("CURSOR content:", jsonObject.toString());
                     data.add(jsonObject);
-                    if(cursor.isLast()){
-                        updateSharedPreferances(String.valueOf(jsonObject.get("timestamp")));
-                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
-
+           updateSharedPreferances(currentTimestamp);
         }
         return data;
     }
@@ -74,7 +73,7 @@ public class HSenseDataExporter {
                 .commit();
     }
 
-    private Cursor getData(String lastTimestamp) {
+    private Cursor getData(String lastTimestamp, String currentTimestamp) {
         SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
 
         String selection =
@@ -82,9 +81,11 @@ public class HSenseDataExporter {
                         + MiBandActivitySampleDao.TABLENAME
                         + " WHERE "
                         + MiBandActivitySampleDao.Properties.Timestamp.columnName
-                        + " > ? ";
+                        + " > ? AND "
+                        + MiBandActivitySampleDao.Properties.Timestamp.columnName
+                        + " <= ? ";
 
-        String[] selectionArgs = new String[] {lastTimestamp};
+        String[] selectionArgs = new String[] {lastTimestamp, currentTimestamp};
         Cursor cursor = db.rawQuery(selection, selectionArgs);
 
         return cursor;
