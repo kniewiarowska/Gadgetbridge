@@ -134,7 +134,7 @@ public class HSenseClient {
                     .put("username", username)
                     .put("password", password);
 
-            AsyncTask.execute(new Runnable() {
+           AsyncTask.execute(new Runnable() {
 
                 @Override
                 public void run() {
@@ -167,7 +167,9 @@ public class HSenseClient {
                         e.printStackTrace();
                     }
                 }
-            });
+
+           });
+
 
         } catch (MalformedURLException | JSONException e) {
             e.printStackTrace();
