@@ -125,74 +125,31 @@ public class HSenseClient {
 
     }
 
-    private JSONObject getJsonLoginData(String username, String password) throws MalformedURLException, JSONException {
+    private JSONObject getLoginData(String username, String password) throws MalformedURLException, JSONException {
         return new JSONObject()
                 .put("username", username)
                 .put("password", password);
     }
 
-    private URL getloginUrl() throws MalformedURLException {
-       return new URL(hSenseUrl + "/login");
+    private JSONObject getRegisterData(String username, String password, String reaptedPassword, String emial) throws MalformedURLException, JSONException {
+        URL registerEndpoint = new URL(hSenseUrl + "/register");
+        return new JSONObject()
+                .put("username", username)
+                .put("password", password)
+                .put("repeated-password", reaptedPassword)
+                .put("email", emial);
     }
 
     public HttpsURLConnection getLoginConnection(String username, String password) throws IOException, JSONException {
-        JSONObject loginData = getJsonLoginData(username, password);
-        URL loginEndpoint = getloginUrl();
+        JSONObject loginData = getLoginData(username, password);
+        URL loginEndpoint = new URL(hSenseUrl + "/login");
         return prepareConnectionAndExecutePOSTRequest(loginEndpoint, loginData);
     }
 
-    public Integer login(String username, String password) {
-
-        final Integer[] responseCodeValue = new Integer[1];
-
-        try {
-            URL loginEndpoint = new URL(hSenseUrl + "/login");
-            JSONObject dataObject = new JSONObject()
-                    .put("username", username)
-                    .put("password", password);
-
-           AsyncTask.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(loginEndpoint, dataObject);
-
-                        int responseCode = connection.getResponseCode();
-                        Log.i(TAG, "POST Response Code :: " + responseCode);
-
-                        if (responseCode == connection.HTTP_OK) {
-                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                            String inputLine;
-                            StringBuffer response = new StringBuffer();
-
-                            while ((inputLine = in.readLine()) != null) {
-                                response.append(inputLine);
-                            }
-
-                            in.close();
-                            JSONObject reply = new JSONObject(response.toString());
-                            String jwt = reply.get("jwt").toString();
-                            hSenseAuthManager.setUpAuthData(username, password, jwt);
-
-                        } else {
-                            Log.i(TAG, "POST request did not work.");
-                        }
-                        responseCodeValue[0] = responseCode;
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-           });
-
-
-        } catch (MalformedURLException | JSONException e) {
-            e.printStackTrace();
-        }
-
-        return responseCodeValue[0];
+    public HttpsURLConnection getRegisterConnection(String username, String password, String reaptedPassword, String emial) throws IOException, JSONException {
+        JSONObject registerData = getRegisterData(username, password,reaptedPassword, emial);
+        URL registerEndpoint = new URL(hSenseUrl + "/register");
+        return prepareConnectionAndExecutePOSTRequest(registerEndpoint, registerData);
     }
 
     private boolean checkIfTokenIsActive() {
@@ -261,5 +218,59 @@ public class HSenseClient {
 
     public void setJwtToken(String username, String password, String jwt){
         hSenseAuthManager.setUpAuthData(username, password, jwt);
+    }
+
+    public Integer login(String username, String password) {
+
+        final Integer[] responseCodeValue = new Integer[1];
+
+        try {
+            URL loginEndpoint = new URL(hSenseUrl + "/login");
+            JSONObject dataObject = new JSONObject()
+                    .put("username", username)
+                    .put("password", password);
+
+            AsyncTask.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(loginEndpoint, dataObject);
+
+                        int responseCode = connection.getResponseCode();
+                        Log.i(TAG, "POST Response Code :: " + responseCode);
+
+                        if (responseCode == connection.HTTP_OK) {
+                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            String inputLine;
+                            StringBuffer response = new StringBuffer();
+
+                            while ((inputLine = in.readLine()) != null) {
+                                response.append(inputLine);
+                            }
+
+                            in.close();
+                            JSONObject reply = new JSONObject(response.toString());
+                            String jwt = reply.get("jwt").toString();
+                            hSenseAuthManager.setUpAuthData(username, password, jwt);
+
+                        } else {
+                            Log.i(TAG, "POST request did not work.");
+                        }
+                        responseCodeValue[0] = responseCode;
+
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            });
+
+
+        } catch (MalformedURLException | JSONException e) {
+            e.printStackTrace();
+        }
+
+        return responseCodeValue[0];
     }
 }

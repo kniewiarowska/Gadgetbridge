@@ -17,27 +17,24 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class LoginTask extends AsyncTask<String, Void, String> {
+public class RegisterTask extends AsyncTask<String, Void, String> {
 
     private HSenseClient hSenseClient;
     private String username;
     private String password;
-
-    public LoginTask(HSenseClient hSenseClient) {
-        this.hSenseClient = hSenseClient;
-    }
+    private String repeatedPassword;
+    private String emial;
 
     @Override
     protected String doInBackground(String... strings) {
-
         HttpsURLConnection connection = null;
         try {
             getUserData(strings); //TODO
-            connection = hSenseClient.getLoginConnection(username, password);
+            connection = hSenseClient.getRegisterConnection(username, password, repeatedPassword, emial);
             int responseCode = connection.getResponseCode();
             Log.i(TAG, "POST Response Code :: " + responseCode);
             if (responseCode == connection.HTTP_OK) {
-                return getJwtToken(connection);
+                return getResponse(connection);
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -50,22 +47,12 @@ public class LoginTask extends AsyncTask<String, Void, String> {
         if (!userData.isEmpty()) {
             this.username = userData.get(0).toString();
             this.password = userData.get(1).toString();
+            this.repeatedPassword = userData.get(2).toString();
+            this.emial = userData.get(3).toString();
         }
     }
 
-    @Override
-    protected void onPostExecute(String jwtToken) {
-        super.onPostExecute(jwtToken);
-
-        if (jwtToken != null) {
-            hSenseClient.setJwtToken(username, password, jwtToken);
-        } else {
-            Log.i(TAG, "POST request did not work.");
-
-        }
-    }
-
-    private String getJwtToken(HttpsURLConnection connection) throws IOException, JSONException {
+    private String getResponse(HttpsURLConnection connection) throws IOException, JSONException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();
@@ -74,8 +61,6 @@ public class LoginTask extends AsyncTask<String, Void, String> {
             response.append(inputLine);
         }
         in.close();
-        JSONObject reply = new JSONObject(response.toString());
-        return reply.get("jwt").toString();
+        return response.toString();
     }
-
 }
