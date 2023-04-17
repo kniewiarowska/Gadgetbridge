@@ -4,6 +4,8 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.util.Log;
 
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
+
 public class HSenseJobService extends JobService {
 
     private final String TAG = "HSenseJobService";

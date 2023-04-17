@@ -1,4 +1,4 @@
-package nodomain.freeyourgadget.gadgetbridge.service.hsense;
+package nodomain.freeyourgadget.gadgetbridge.service.hsense.client;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -18,6 +18,7 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import nodomain.freeyourgadget.gadgetbridge.database.HSenseDataExporter;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseAuthManager;
 
 public class HSenseClient {
 
@@ -42,7 +43,7 @@ public class HSenseClient {
         return connection;
     }
 
-    private HttpsURLConnection prepareConnectionAndExecutePOSTRequest(URL url, JSONObject jsonObject) throws IOException {
+    public HttpsURLConnection prepareConnectionAndExecutePOSTRequest(URL url, JSONObject jsonObject) throws IOException {
 
         HttpsURLConnection connection = prepareConnection(url);
         OutputStream os = connection.getOutputStream();
@@ -122,6 +123,22 @@ public class HSenseClient {
             e.printStackTrace();
         }
 
+    }
+
+    private JSONObject getJsonLoginData(String username, String password) throws MalformedURLException, JSONException {
+        return new JSONObject()
+                .put("username", username)
+                .put("password", password);
+    }
+
+    private URL getloginUrl() throws MalformedURLException {
+       return new URL(hSenseUrl + "/login");
+    }
+
+    public HttpsURLConnection getLoginConnection(String username, String password) throws IOException, JSONException {
+        JSONObject loginData = getJsonLoginData(username, password);
+        URL loginEndpoint = getloginUrl();
+        return prepareConnectionAndExecutePOSTRequest(loginEndpoint, loginData);
     }
 
     public Integer login(String username, String password) {
@@ -242,4 +259,7 @@ public class HSenseClient {
         return responseCodeValue[0];
     }
 
+    public void setJwtToken(String username, String password, String jwt){
+        hSenseAuthManager.setUpAuthData(username, password, jwt);
+    }
 }
