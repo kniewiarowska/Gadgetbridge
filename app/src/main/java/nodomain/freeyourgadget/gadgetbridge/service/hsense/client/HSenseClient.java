@@ -24,14 +24,10 @@ public class HSenseClient {
 
     public Context context;
     public final String hSenseUrl = "https://hsense.lovemyiot.org";
-    public HSenseDataExporter hSenseDataExporter;
-    public HSenseAuthManager hSenseAuthManager;
     private String TAG = "HSenseClient";
 
     public HSenseClient(Context context) {
         this.context = context;
-        this.hSenseDataExporter = new HSenseDataExporter(context);
-        this.hSenseAuthManager = new HSenseAuthManager(context);
     }
 
     private HttpsURLConnection prepareConnection(URL url) throws IOException {
@@ -64,8 +60,7 @@ public class HSenseClient {
         return connection;
     }
 
-
-    private BufferedReader getResponseFromEndpoint(HttpsURLConnection connection) throws IOException {
+    public String getResponseFromEndpoint(HttpsURLConnection connection) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
 
@@ -75,54 +70,7 @@ public class HSenseClient {
         }
         in.close();
 
-        return in;
-    }
-
-    public void register(String username, String password, String reaptedPassword, String emial) {
-
-        try {
-            URL registerEndpoint = new URL(hSenseUrl + "/register");
-            JSONObject registerObject = new JSONObject()
-                    .put("username", username)
-                    .put("password", password)
-                    .put("repeated-password", reaptedPassword)
-                    .put("email", emial);
-
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(registerEndpoint, registerObject);
-
-                        int responseCode = connection.getResponseCode();
-                        Log.i("HSenseClient", "POST Response Code :: " + responseCode);
-
-                        if (responseCode == connection.HTTP_OK) {
-                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                            String inputLine;
-                            StringBuffer response = new StringBuffer();
-
-                            while ((inputLine = in.readLine()) != null) {
-                                response.append(inputLine);
-                            }
-
-                            in.close();
-                        } else {
-                            Log.i(TAG, "POST request did not work.");
-                            //TODO throw exception when request did not work
-                            //TODO print response from server
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        } catch (JSONException | MalformedURLException e) {
-            e.printStackTrace();
-        }
-
+        return in.toString();
     }
 
     private JSONObject getLoginData(String username, String password) throws MalformedURLException, JSONException {
@@ -147,130 +95,13 @@ public class HSenseClient {
     }
 
     public HttpsURLConnection getRegisterConnection(String username, String password, String reaptedPassword, String emial) throws IOException, JSONException {
-        JSONObject registerData = getRegisterData(username, password,reaptedPassword, emial);
+        JSONObject registerData = getRegisterData(username, password, reaptedPassword, emial);
         URL registerEndpoint = new URL(hSenseUrl + "/register");
         return prepareConnectionAndExecutePOSTRequest(registerEndpoint, registerData);
     }
 
-    private boolean checkIfTokenIsActive() {
-        return hSenseAuthManager.checkIfJwtIsActive();
-    }
-
-    private String getActiveJwtToken() {
-        if (!checkIfTokenIsActive()) {
-            updateJwtManager();
-            Log.i("HSenseClient","Token not active");
-        } else {
-            Log.i("HSenseClient","Token is active");
-
-        }
-        return hSenseAuthManager.getJwtToken();
-    }
-
-    private void updateJwtManager() {
-        String username = hSenseAuthManager.getUsername();
-        String password = hSenseAuthManager.getPassword();
-
-        Integer resonCode = login(username, password);
-        if (resonCode != null && resonCode == 200) {
-            Log.i("HSenseClient", "Update sucessfull");
-        } else {
-            //TODO throw exception
-        }
-    }
-
-    public Integer save() {
-        final Integer[] responseCodeValue = new Integer[1];
-
-        try {
-            URL loginEndpoint = new URL(hSenseUrl + "/hsense/save");
-            getActiveJwtToken();
-            List<JSONObject> dataObject = hSenseDataExporter.getDataToPublish();
-            AsyncTask.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        HttpsURLConnection connection = postDataToServer(loginEndpoint, dataObject, hSenseAuthManager.getJwtToken());
-                        int responseCode = connection.getResponseCode();
-                        Log.i(TAG, "POST Response Code :: " + responseCode);
-
-                        if (responseCode == connection.HTTP_OK) {
-                            BufferedReader in = getResponseFromEndpoint(connection);
-                        } else {
-                            Log.i(TAG, "POST request did not work.");
-                        }
-
-                        responseCodeValue[0] = responseCode;
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return responseCodeValue[0];
-    }
-
-    public void setJwtToken(String username, String password, String jwt){
-        hSenseAuthManager.setUpAuthData(username, password, jwt);
-    }
-
-    public Integer login(String username, String password) {
-
-        final Integer[] responseCodeValue = new Integer[1];
-
-        try {
-            URL loginEndpoint = new URL(hSenseUrl + "/login");
-            JSONObject dataObject = new JSONObject()
-                    .put("username", username)
-                    .put("password", password);
-
-            AsyncTask.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        HttpsURLConnection connection = prepareConnectionAndExecutePOSTRequest(loginEndpoint, dataObject);
-
-                        int responseCode = connection.getResponseCode();
-                        Log.i(TAG, "POST Response Code :: " + responseCode);
-
-                        if (responseCode == connection.HTTP_OK) {
-                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                            String inputLine;
-                            StringBuffer response = new StringBuffer();
-
-                            while ((inputLine = in.readLine()) != null) {
-                                response.append(inputLine);
-                            }
-
-                            in.close();
-                            JSONObject reply = new JSONObject(response.toString());
-                            String jwt = reply.get("jwt").toString();
-                            hSenseAuthManager.setUpAuthData(username, password, jwt);
-
-                        } else {
-                            Log.i(TAG, "POST request did not work.");
-                        }
-                        responseCodeValue[0] = responseCode;
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            });
-
-
-        } catch (MalformedURLException | JSONException e) {
-            e.printStackTrace();
-        }
-
-        return responseCodeValue[0];
+    public HttpsURLConnection sentDataConnection(String jwt, List<JSONObject> miBandData) throws IOException, JSONException {
+        URL loginEndpoint = new URL(hSenseUrl + "/hsense/save");
+        return postDataToServer(loginEndpoint, miBandData, jwt);
     }
 }

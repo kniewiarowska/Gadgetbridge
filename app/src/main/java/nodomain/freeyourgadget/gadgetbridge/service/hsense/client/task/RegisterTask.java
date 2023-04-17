@@ -1,7 +1,9 @@
-package nodomain.freeyourgadget.gadgetbridge.service.hsense.client;
+package nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task;
 
+import static android.view.View.combineMeasuredStates;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -17,24 +19,26 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseAuthManager;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
+
 public class RegisterTask extends AsyncTask<String, Void, String> {
 
     private HSenseClient hSenseClient;
-    private String username;
-    private String password;
-    private String repeatedPassword;
-    private String emial;
+
+    public RegisterTask(Context context) {
+        this.hSenseClient = new HSenseClient(context);
+    }
 
     @Override
     protected String doInBackground(String... strings) {
         HttpsURLConnection connection = null;
         try {
-            getUserData(strings); //TODO
-            connection = hSenseClient.getRegisterConnection(username, password, repeatedPassword, emial);
-            int responseCode = connection.getResponseCode();
+            connection = createConnectionWithRegisterData(strings);
+           int responseCode = connection.getResponseCode();
             Log.i(TAG, "POST Response Code :: " + responseCode);
             if (responseCode == connection.HTTP_OK) {
-                return getResponse(connection);
+                return hSenseClient.getResponseFromEndpoint(connection);
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -42,25 +46,21 @@ public class RegisterTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    private void getUserData(String... strings) {
+    private HttpsURLConnection createConnectionWithRegisterData(String... strings) throws JSONException, IOException {
+
         List<String> userData = Arrays.stream(strings).collect(Collectors.toList());
         if (!userData.isEmpty()) {
-            this.username = userData.get(0).toString();
-            this.password = userData.get(1).toString();
-            this.repeatedPassword = userData.get(2).toString();
-            this.emial = userData.get(3).toString();
+            String username = userData.get(0).toString();
+            String password = userData.get(1).toString();
+            String repeatedPassword = userData.get(2).toString();
+            String emial = userData.get(3).toString();
+            return hSenseClient.getRegisterConnection(username, password, repeatedPassword, emial);
         }
-    }
 
     private String getResponse(HttpsURLConnection connection) throws IOException, JSONException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-        return response.toString();
     }
 }

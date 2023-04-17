@@ -1,5 +1,6 @@
 package nodomain.freeyourgadget.gadgetbridge.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,8 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
-import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.LoginTask;
-import nodomain.freeyourgadget.gadgetbridge.util.StringUtils;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task.LoginTask;
 
 public class HSenseLoginActivity extends AppCompatActivity {
 
@@ -22,6 +22,7 @@ public class HSenseLoginActivity extends AppCompatActivity {
     private EditText passwordEdit;
     private Button loginButton;
     private LoginTask loginTask;
+    private Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +31,9 @@ public class HSenseLoginActivity extends AppCompatActivity {
         loginEdit = findViewById(R.id.login_edit);
         passwordEdit = findViewById(R.id.password_edit);
         loginButton = findViewById(R.id.login_button);
+        registerButton = findViewById(R.id.register_button);
 
-        hSenseClient = new HSenseClient(this.getApplicationContext());
-        loginTask = new LoginTask(hSenseClient);
+        loginTask = new LoginTask(this.getApplicationContext());
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -41,10 +42,18 @@ public class HSenseLoginActivity extends AppCompatActivity {
                 String jwt = loginAttempt(login, password);
 
                 if (jwt == null) {
-                    Toast.makeText(hSenseClient.context.getApplicationContext(), "Login failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_SHORT).show();
                 } else {
                     finish();
                 }
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent registerIntent = new Intent(getApplicationContext(), RegisterHSenseActivity.class);
+                startActivity(registerIntent);
             }
         });
     }

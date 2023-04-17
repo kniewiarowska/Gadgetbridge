@@ -71,7 +71,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name=".activities.RegisterHSenseActivity"
             android:exported="false" >
             <meta-data
                 android:name="android.app.lib_name"

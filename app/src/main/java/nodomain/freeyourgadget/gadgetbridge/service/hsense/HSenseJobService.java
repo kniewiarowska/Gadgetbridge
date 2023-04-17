@@ -5,11 +5,13 @@ import android.app.job.JobService;
 import android.util.Log;
 
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task.SentDataTask;
 
 public class HSenseJobService extends JobService {
 
     private final String TAG = "HSenseJobService";
     private boolean jobSetUpdated = false;
+    private SentDataTask sentDataTask;
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
@@ -31,9 +33,9 @@ public class HSenseJobService extends JobService {
             @Override
             public void run() {
                 HSenseClient hSenseClient = new HSenseClient(getApplicationContext());
-                Integer responseCode = hSenseClient.save();
+                Integer responseCode =
 
-
+//TODO add SEND DATA TASK
                 Log.i(TAG, "HSense Job Performed");
                 if (responseCode != null && responseCode == 200) {
                     Log.i(TAG, "Job sucessfull");

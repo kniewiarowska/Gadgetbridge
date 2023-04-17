@@ -1,7 +1,8 @@
-package nodomain.freeyourgadget.gadgetbridge.service.hsense.client;
+package nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -17,14 +18,19 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseAuthManager;
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
+
 public class LoginTask extends AsyncTask<String, Void, String> {
 
     private HSenseClient hSenseClient;
+    private HSenseAuthManager hSenseAuthManager;
     private String username;
     private String password;
 
-    public LoginTask(HSenseClient hSenseClient) {
-        this.hSenseClient = hSenseClient;
+    public LoginTask(Context context) {
+        this.hSenseClient = new HSenseClient(context);
+        this.hSenseAuthManager = new HSenseAuthManager(context);
     }
 
     @Override
@@ -32,7 +38,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 
         HttpsURLConnection connection = null;
         try {
-            getUserData(strings); //TODO
+            getUserData(strings);
             connection = hSenseClient.getLoginConnection(username, password);
             int responseCode = connection.getResponseCode();
             Log.i(TAG, "POST Response Code :: " + responseCode);
@@ -58,7 +64,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(jwtToken);
 
         if (jwtToken != null) {
-            hSenseClient.setJwtToken(username, password, jwtToken);
+            hSenseAuthManager.setUpAuthData(username, password, jwtToken);
         } else {
             Log.i(TAG, "POST request did not work.");
 

@@ -68,9 +68,9 @@ import java.util.Objects;
 import java.util.Set;
 
 import de.cketti.library.changelog.ChangeLog;
+import nodomain.freeyourgadget.gadgetbridge.BuildConfig;
 import nodomain.freeyourgadget.gadgetbridge.GBApplication;
 import nodomain.freeyourgadget.gadgetbridge.R;
-import nodomain.freeyourgadget.gadgetbridge.BuildConfig;
 import nodomain.freeyourgadget.gadgetbridge.adapter.GBDeviceAdapterv2;
 import nodomain.freeyourgadget.gadgetbridge.database.DBAccess;
 import nodomain.freeyourgadget.gadgetbridge.database.DBHandler;
@@ -80,7 +80,6 @@ import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.ActivitySample;
 import nodomain.freeyourgadget.gadgetbridge.model.DailyTotals;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
-import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseService;
 import nodomain.freeyourgadget.gadgetbridge.util.AndroidUtils;
 import nodomain.freeyourgadget.gadgetbridge.util.DeviceHelper;
 import nodomain.freeyourgadget.gadgetbridge.util.GB;
