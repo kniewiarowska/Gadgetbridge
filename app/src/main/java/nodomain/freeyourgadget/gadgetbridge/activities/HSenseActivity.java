@@ -34,7 +34,7 @@ public class HSenseActivity extends AppCompatActivity {
         loginStatus = findViewById(R.id.login_status);
         saveButton = findViewById(R.id.save_button);
         logOutButton = findViewById(R.id.logout_button);
-        sentStatus = findViewById(R.id.last_sent_status);
+        sentStatus = findViewById(R.id.last_status);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         hSenseClient = new HSenseClient(this.getApplicationContext());
@@ -45,12 +45,8 @@ public class HSenseActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Integer integer = hSenseSendDataService.sentData();
-                if(integer == 200){
-                    //TODO success
-                } else {
-                    //TODO DUPA
-                }
+                 hSenseSendDataService.sentData();
+
             }
         });
 
@@ -65,6 +61,8 @@ public class HSenseActivity extends AppCompatActivity {
         setLoginStatusText();
         setSentStatusText();
     }
+
+
 
     private void setLoginStatusText() {
         if (hSenseAuthManager.checkIfJwtIsActive()) {

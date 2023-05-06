@@ -14,21 +14,12 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/last_sent_status"
+        android:id="@+id/last_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp"
         tools:ignore="MissingConstraints"
         app:layout_constraintTop_toBottomOf="@+id/login_status"/>
-
-    <TextView
-        app:layout_constraintTop_toBottomOf="@+id/last_sent_status"
-        android:id="@+id/login_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:text="@string/login_to_hsense_service"
-        tools:ignore="MissingConstraints" />
 
 
     <Button
@@ -36,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/send_data_manually"
-        app:layout_constraintTop_toBottomOf="@+id/login_status"
+        app:layout_constraintTop_toBottomOf="@+id/last_status"
         tools:ignore="MissingConstraints"
         android:padding="20dp" />
 

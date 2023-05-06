@@ -20,36 +20,36 @@ public class HSenseSendDataService {
         this.hSenseAuthManager = new HSenseAuthManager(context);
     }
 
-    public Integer sentData() {
+    public void sentData() {
         try {
             if (hSenseAuthManager.checkIfLoginDataAvialiable()) {
-                return tryToSendData();
+                tryToSendData();
             }
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         Log.i("Sentdata", "Noone was logged in application - data cannot be saved");
-        return null;
+
     }
 
-    private Integer tryToSendData() throws ExecutionException, InterruptedException {
+    private void tryToSendData() throws ExecutionException, InterruptedException {
         if (hSenseAuthManager.checkIfJwtIsActive()) {
-            return sendData();
+             sendData();
         } else {
-            return updateTokenAndSaveData();
+            updateTokenAndSaveData();
         }
     }
 
-    private Integer sendData() throws ExecutionException, InterruptedException {
-        return sentDataTask.execute(hSenseAuthManager.getJwtToken()).get();
+    private void sendData() throws ExecutionException, InterruptedException {
+        sentDataTask.execute(hSenseAuthManager.getJwtToken());
     }
 
-    private Integer updateTokenAndSaveData() throws ExecutionException, InterruptedException {
+    private void updateTokenAndSaveData() throws ExecutionException, InterruptedException {
 
         String jwt = loginTask.execute(hSenseAuthManager.getUsername(), hSenseAuthManager.getPassword()).get();
         if (jwt != null) {
-            return sentDataTask.execute(hSenseAuthManager.getJwtToken()).get();
+            sentDataTask.execute(hSenseAuthManager.getJwtToken()).get();
         }
-        return null;
+
     }
 }

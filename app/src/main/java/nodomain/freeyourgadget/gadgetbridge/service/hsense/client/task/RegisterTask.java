@@ -57,10 +57,7 @@ public class RegisterTask extends AsyncTask<String, Void, String> {
             return hSenseClient.getRegisterConnection(username, password, repeatedPassword, emial);
         }
 
-    private String getResponse(HttpsURLConnection connection) throws IOException, JSONException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+        return null;
 
     }
 }
