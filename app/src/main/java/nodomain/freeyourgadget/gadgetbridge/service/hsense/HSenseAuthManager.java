@@ -50,7 +50,7 @@ public class HSenseAuthManager {
         }
         LocalDateTime jwtDate = LocalDateTime.parse(jwtTokenDate);
 
-        if (LocalDateTime.now().isBefore(jwtDate.plusDays(1))) {
+        if (LocalDateTime.now().isBefore(jwtDate.plusMinutes(1))) {
             return true;
         } else {
             return false;

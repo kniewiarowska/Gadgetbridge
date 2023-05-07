@@ -46,7 +46,7 @@ public class HSenseActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                  hSenseSendDataService.sentData();
-
+                 recreate();
             }
         });
 

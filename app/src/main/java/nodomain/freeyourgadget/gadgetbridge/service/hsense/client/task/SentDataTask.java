@@ -6,6 +6,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Lists;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,12 +36,7 @@ public class SentDataTask extends AsyncTask<String, Void, Integer> {
         try {
             List<JSONObject> miBandData = hSenseDataExporter.getDataToPublish();
             String jwt = Arrays.stream(strings).findAny().get();
-
-            connection = hSenseClient.sentDataConnection(jwt, miBandData);
-
-            int responseCode = connection.getResponseCode();
-            Log.i(TAG, "POST Response Code :: " + responseCode);
-            return responseCode;
+            sendRecords(miBandData, jwt, connection);
 
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -47,4 +44,19 @@ public class SentDataTask extends AsyncTask<String, Void, Integer> {
         return null;
     }
 
+    private int sendRecords(List<JSONObject> collection, String jwt, HttpsURLConnection connection) throws JSONException, IOException {
+        List<List<JSONObject>> output = Lists.partition(collection, 100);
+        int responseCode = 0;
+        for(List<JSONObject> list : output){
+            connection = hSenseClient.sentDataConnection(jwt, list);
+            responseCode = connection.getResponseCode();
+            Log.i(TAG, "POST Response Code :: " + responseCode);
+        }
+        return responseCode;
+    }
+
+
+
 }
+
+

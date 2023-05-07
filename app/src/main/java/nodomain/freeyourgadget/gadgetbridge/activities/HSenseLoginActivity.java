@@ -44,7 +44,10 @@ public class HSenseLoginActivity extends AppCompatActivity {
                 if (jwt == null) {
                     Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_SHORT).show();
                 } else {
+                    Intent refresh = new Intent(getApplicationContext(), HSenseActivity.class);
+                    startActivity(refresh);
                     finish();
+
                 }
             }
         });
