@@ -20,7 +20,7 @@ public class HSenseSendDataService {
         this.hSenseAuthManager = new HSenseAuthManager(context);
     }
 
-    public void sentData() {
+    public void sentData() { //TODO change name
         try {
             if (hSenseAuthManager.checkIfLoginDataAvialiable()) {
                 tryToSendData();

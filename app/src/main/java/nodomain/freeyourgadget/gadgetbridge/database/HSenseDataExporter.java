@@ -47,7 +47,7 @@ public class HSenseDataExporter {
                     JSONObject jsonObject = new JSONObject()
                             .put("timestamp", cursor.getString(0))
                             .put("device_id", cursor.getString(1))
-                            .put("user_id", cursor.getString(2))
+                            .put("user_id", sharedPreferences.getString("username", "0"))
                             .put("raw_intensity", cursor.getString(3))
                             .put("steps", cursor.getString(4))
                             .put("heart_rate", cursor.getString(5));
