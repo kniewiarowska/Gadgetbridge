@@ -26,37 +26,60 @@
         android:id="@+id/fellForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@+id/last_status"
-        android:orientation="horizontal">
+        android:layout_marginTop="20dp"
+        android:layout_marginVertical="20dp"
+        tools:layout_editor_absoluteX="0dp">
 
         <ImageView
             android:id="@+id/fellButton1"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            />
+            android:layout_width="0dp"
+            android:layout_weight = "1"
+            android:layout_height="80dp"
+            android:background="#F44336"
+            app:srcCompat="@drawable/ic_1_sentiment_sad_px"
+            app:tint="#FFFFFF" />
 
         <ImageView
             android:id="@+id/fellButton2"
-            android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:layout_width="0dp"
+            android:layout_weight = "1"
+            android:layout_height="80dp"
+            android:background="#FF9800"
+            app:srcCompat="@drawable/ic_2_mood_bad_px"
+            app:tint="#FFFFFF" />
 
         <ImageView
             android:id="@+id/fellButton3"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp" />
+            android:layout_width="0dp"
+            android:layout_weight = "1"
+            android:layout_height="80dp"
+            android:background="#FFEB3B"
+            app:srcCompat="@drawable/ic_3_sentiment_neutral_px"
+            app:tint="#FFFFFF" />
 
         <ImageView
             android:id="@+id/fellButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp" />
+            android:layout_width="0dp"
+            android:layout_weight = "1"
+            android:layout_height="80dp"
+            android:background="#8BC34A"
+            app:srcCompat="@drawable/ic_4_mood_px"
+            app:tint="#FFFFFF" />
 
         <ImageView
             android:id="@+id/fellButton5"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp" />
+            android:layout_width="0dp"
+            android:layout_weight = "1"
+            android:layout_height="80dp"
+            android:background="#4CAF50"
+            app:srcCompat="@drawable/ic_5_sentiment_excited_px"
+            app:tint="#FFFFFF" />
     </LinearLayout>
 
     <Button
+        android:layout_marginTop="20dp"
         android:id="@+id/save_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
