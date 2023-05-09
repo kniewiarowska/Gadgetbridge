@@ -80,7 +80,7 @@ public class HSenseActivity extends AppCompatActivity {
     }
 
     private void setSentStatusText() {
-        sentStatus.setText("Last update" +  sharedPreferences.getString("lastTimestamp", "0"));
+        sentStatus.setText("Last update " +  sharedPreferences.getString("lastTimestamp", "0"));
     }
 
 

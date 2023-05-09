@@ -1,8 +1,12 @@
 package nodomain.freeyourgadget.gadgetbridge.service.hsense;
 
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import androidx.preference.PreferenceManager;
 
 import java.time.LocalDateTime;
 
@@ -16,18 +20,19 @@ public class HSenseAuthManager {
     SharedPreferences sharedPreferences;
 
     public HSenseAuthManager(Context context) {
-        sharedPreferences = context.getSharedPreferences("MyPref", 0);
+        sharedPreferences = getDefaultSharedPreferences(context);
     }
 
     public void setUpAuthData(String username, String password, String jwtToken) {
-        SharedPreferences.Editor myEdit = sharedPreferences.edit();
-        // write all the data entered by the user in SharedPreference and apply
-        myEdit.putString(USERNAME, username);
-        myEdit.putString(PASSWORD, password);
-        myEdit.putString(JWT, jwtToken);
-        myEdit.putString(JWT_TOKEN_DATE, LocalDateTime.now().toString());
-        myEdit.apply();
-        myEdit.commit();
+        sharedPreferences.edit()
+                // write all the data entered by the user in SharedPreference and apply
+                .putString(USERNAME, username)
+                .putString(PASSWORD, password)
+                .putString(JWT, jwtToken)
+                .putString(JWT_TOKEN_DATE, LocalDateTime.now().toString())
+                .commit();
+
+
     }
 
     public String getPassword() {
@@ -57,7 +62,7 @@ public class HSenseAuthManager {
         }
     }
 
-    public boolean checkIfLoginDataAvialiable(){
+    public boolean checkIfLoginDataAvialiable() {
         return (getUsername() != null & getPassword() != null);
     }
 
