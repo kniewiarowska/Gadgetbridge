@@ -6,14 +6,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Lists;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -24,12 +20,12 @@ import javax.net.ssl.HttpsURLConnection;
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.HSenseAuthManager;
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.HSenseClient;
 
-public class FormTask extends AsyncTask<String, Void, String> {
+public class FeelingTask extends AsyncTask<String, Void, String> {
 
     private HSenseClient hSenseClient;
     private HSenseAuthManager hSenseAuthManager;
 
-    public FormTask(Context context) {
+    public FeelingTask(Context context) {
         this.hSenseClient = new HSenseClient(context);
         this.hSenseAuthManager = new HSenseAuthManager(context);
     }

@@ -77,6 +77,7 @@ public class HSenseActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 hSenseSendDataService.sentData();
+                hSenseSendDataService.sendFeelingRate(feelingResult);
                 recreate();
             }
         });

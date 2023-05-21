@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.util.concurrent.ExecutionException;
 
+import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task.FeelingTask;
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task.LoginTask;
 import nodomain.freeyourgadget.gadgetbridge.service.hsense.client.task.SentDataTask;
 
@@ -12,10 +13,12 @@ public class HSenseSendDataService {
 
     private SentDataTask sentDataTask;
     private LoginTask loginTask;
+    private FeelingTask feelingTask;
     private HSenseAuthManager hSenseAuthManager;
 
     public HSenseSendDataService(Context context) {
         this.sentDataTask = new SentDataTask(context);
+        this.feelingTask = new FeelingTask(context);
         this.loginTask = new LoginTask(context);
         this.hSenseAuthManager = new HSenseAuthManager(context);
     }
@@ -52,4 +55,11 @@ public class HSenseSendDataService {
         }
 
     }
+
+    public void sendFeelingRate(int feelingResult) {
+       //TODO logic with login - in case jwt to end
+        feelingTask.execute(String.valueOf(feelingResult), hSenseAuthManager.getJwtToken());
+    }
+
+
 }

@@ -1726,5 +1726,6 @@
     <string name="login_hint">Login</string>
     <string name="login_to_hsense_service">Login to HSense service:</string>
     <string name="login_status">Login status:</string>
-    <string name="send_data_manually">Send data manually</string>
+    <string name="send_data_manually">Send data </string>
+    <string name="log_out">LOG OUT</string>
 </resources>
