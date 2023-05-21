@@ -60,6 +60,17 @@ public class HSenseClient {
         return connection;
     }
 
+    private HttpsURLConnection postDataToServer(URL url, JSONObject jsonObject, String jwt) throws IOException {
+        HttpsURLConnection connection = prepareConnection(url);
+        connection.setRequestProperty("Authorization", "Bearer " + jwt);
+
+        OutputStream os = connection.getOutputStream();
+        os.write(jsonObject.toString().getBytes());
+        os.flush();
+        os.close();
+        return connection;
+    }
+
     public String getResponseFromEndpoint(HttpsURLConnection connection) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
@@ -104,4 +115,10 @@ public class HSenseClient {
         URL loginEndpoint = new URL(hSenseUrl + "/hsense/save");
         return postDataToServer(loginEndpoint, miBandData, jwt);
     }
+
+    public HttpsURLConnection sentResultConnection(String jwt, JSONObject formData) throws IOException, JSONException {
+        URL loginEndpoint = new URL(hSenseUrl + "/hsense/feeling-result");
+        return postDataToServer(loginEndpoint, formData, jwt);
+    }
+
 }

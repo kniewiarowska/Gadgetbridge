@@ -35,6 +35,11 @@
 
     <color name="alternate_row_background_light">#FFEDEDED</color>
     <color name="alternate_row_background_dark">#545254</color>
+    <color name="feel_color1" type="color">#F44336</color>
+    <color name="feel_color2" type="color">#FF9800</color>
+    <color name="feel_color3" type="color">#FFEB3B</color>
+    <color name="feel_color4" type="color">#8BC34A</color>
+    <color name="feel_color5" type="color">#4CAF50</color>
 
     <drawable name="selected">@color/accent</drawable>
 
