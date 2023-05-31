@@ -47,7 +47,7 @@ public class FeelingTask extends AsyncTask<String, Void, String> {
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }
-                sendFormResult(jsonObject, jwt, connection);
+                sendFormResult(jsonObject, jwt);
 
             }
             //TODO clean up
@@ -57,9 +57,9 @@ public class FeelingTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    private int sendFormResult(JSONObject formResult, String jwt, HttpsURLConnection connection) throws JSONException, IOException {
+    private int sendFormResult(JSONObject formResult, String jwt) throws JSONException, IOException {
         int responseCode = 0;
-        connection = hSenseClient.sentResultConnection(jwt, formResult);
+        HttpsURLConnection connection = hSenseClient.sentResultConnection(jwt, formResult);
         responseCode = connection.getResponseCode();
         Log.i(TAG, "POST Response Code :: " + responseCode);
 

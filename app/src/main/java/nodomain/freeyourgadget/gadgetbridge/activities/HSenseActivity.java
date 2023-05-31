@@ -78,7 +78,9 @@ public class HSenseActivity extends AppCompatActivity {
             public void onClick(View view) {
                 hSenseSendDataService.sentData();
                 hSenseSendDataService.sendFeelingRate(feelingResult);
-                recreate();
+                setSentStatusText();
+                resetButtons();
+
             }
         });
 
@@ -137,6 +139,7 @@ public class HSenseActivity extends AppCompatActivity {
         feelButton5.setBackgroundResource(R.color.feel_color5);
 
         formButtons.forEach(button -> button.setClickable(true));
+
         saveButton.setEnabled(false);
     }
 
@@ -146,12 +149,12 @@ public class HSenseActivity extends AppCompatActivity {
             if (login != null) {
                 loginStatus.setText("Logged as " + login);
                 Log.i("HSense", "Logged as " + login);
-                saveButton.setEnabled(true);
-                logOutButton.setEnabled(true);
+
             }
         } else {
             Intent hSenseLoginIntent = new Intent(this, HSenseLoginActivity.class);
             startActivity(hSenseLoginIntent);
+
         }
     }
 
