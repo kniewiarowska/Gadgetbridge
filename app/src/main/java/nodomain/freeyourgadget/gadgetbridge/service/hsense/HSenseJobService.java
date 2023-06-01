@@ -11,7 +11,7 @@ public class HSenseJobService extends JobService {
 
     private final String TAG = "HSenseJobService";
     private boolean jobSetUpdated = false;
-    private SentDataTask sentDataTask;
+    private HSenseSendDataService hSenseSendDataService;
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
@@ -33,16 +33,8 @@ public class HSenseJobService extends JobService {
             @Override
             public void run() {
                 HSenseClient hSenseClient = new HSenseClient(getApplicationContext());
-                Integer responseCode =
-
-//TODO add SEND DATA TASK
+                hSenseSendDataService.sentData();
                 Log.i(TAG, "HSense Job Performed");
-                if (responseCode != null && responseCode == 200) {
-                    Log.i(TAG, "Job sucessfull");
-                } else {
-                    Log.i(TAG, "Job failed");
-                }
-
                 jobFinished(params, false);
             }
 
