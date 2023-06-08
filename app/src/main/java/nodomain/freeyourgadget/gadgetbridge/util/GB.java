@@ -143,7 +143,7 @@ public class GB {
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-                notificationIntent, 0);
+                notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         return pendingIntent;
     }

@@ -519,8 +519,19 @@ public class ControlCenterv2 extends AppCompatActivity
         if (fakeStateListener == null) {
             fakeStateListener = new PhoneStateListener();
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            if (Build.VERSION.SDK_INT >= 31)
+            {
+                if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
+                {
+                    telephonyManager.listen(fakeStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+                    telephonyManager.listen(fakeStateListener, PhoneStateListener.LISTEN_NONE);
+                }
+            }
+            else {
+
             telephonyManager.listen(fakeStateListener, PhoneStateListener.LISTEN_CALL_STATE);
             telephonyManager.listen(fakeStateListener, PhoneStateListener.LISTEN_NONE);
+            }
         }
     }
 

@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package nodomain.freeyourgadget.gadgetbridge.database;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -53,7 +55,7 @@ public class PeriodicExporter extends BroadcastReceiver {
 
     public static void scheduleAlarm(Context context, Integer autoExportInterval, boolean autoExportEnabled) {
         Intent i = new Intent(context, PeriodicExporter.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_MUTABLE);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         if (!autoExportEnabled) {
