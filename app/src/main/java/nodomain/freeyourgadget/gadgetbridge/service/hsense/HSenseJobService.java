@@ -11,7 +11,7 @@ public class HSenseJobService extends JobService {
 
     private final String TAG = "HSenseJobService";
     private boolean jobSetUpdated = false;
-    private HSenseSendDataService hSenseSendDataService;
+    private HSenseSendDataService hSenseSendDataService = new HSenseSendDataService(getApplicationContext());
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {

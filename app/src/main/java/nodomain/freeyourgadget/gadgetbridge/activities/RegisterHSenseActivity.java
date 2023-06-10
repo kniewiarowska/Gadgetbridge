@@ -27,6 +27,7 @@ public class RegisterHSenseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        hSenseClient = new HSenseClient(getApplicationContext());
         setContentView(R.layout.activity_register);
 
         loginEdit = findViewById(R.id.login_register);

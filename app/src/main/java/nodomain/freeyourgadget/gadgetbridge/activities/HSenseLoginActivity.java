@@ -28,6 +28,8 @@ public class HSenseLoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hsense_login);
+
+        hSenseClient = new HSenseClient(getApplicationContext());
         loginEdit = findViewById(R.id.login_edit);
         passwordEdit = findViewById(R.id.password_edit);
         loginButton = findViewById(R.id.login_button);
